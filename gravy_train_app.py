@@ -38,6 +38,9 @@ st.subheader(f'MP Expense Analysis for financial year 20{financial_year[0:2]}-20
 
 #election_filter = st.sidebar.radio("Election Filter",["Old","New"], captions = ["Outgoing MP","Incoming MP"], help = "On election or by-election year which MP to use.")
 
+cost_select = st.sidebar.multiselect('Select cost categories',['MP Travel','Miscellaneous','Staffing','Winding Up',
+                        'Office Costs','Office Costs Expenditure','Staff Travel','Travel','Dependant Travel','Miscellaneous expenses','Accommodation','Start Up'])
+
 election_filter = st.sidebar.selectbox("Election Filter",("Outgoing MP","Incoming MP"), help = "On election or by-election year which MP to use.")
 
 tab1, tab2, tab3 = st.tabs(["Map", "About", "Analysis"])
