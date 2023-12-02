@@ -3,6 +3,8 @@ import pydeck as pdk
 import geopandas as gpd
 import pandas as pd
 import json
+from duckdb_connection import DuckDBConnection
+import gravysql
 
 st.set_page_config(
     page_title="The Gravy Train",
@@ -11,37 +13,37 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+db= f"md:gravy_train?motherduck_token={st.secrets['MOTHERDUCK_TOKEN']}"
+
+conn = st.connection("duckdb", type=DuckDBConnection, database=db)
+
+
+
 with open('data\colorbrewer.json') as f:
   colour_brewer = json.load(f)
 
 with open('style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
-api_url = st.secrets["api_url"]
-DATA_URL = "data\PCON_DEC_2021_UK_BUC.geojson"
 bins = 9
 colour_scheme = colour_brewer["MyViridis"][f"{bins}"]
-cost_category = 'ALL' 
 selected_year = '2022'
 
 def get_financial_year(yr):
     fin_yr = int(yr[2:])
     return f"{fin_yr}_{fin_yr+1}"
 
-
-
 st.sidebar.header("GravyTrain `V1.0.0`")
-selected_year = st.sidebar.number_input('Choose a year to view', min_value=2010, max_value=2023, value=2022, step=1, help="The financial year runs from 1 April to 31 March")
+selected_year = st.sidebar.number_input('Choose a year to view', min_value=2010, max_value=2025, value=2021, step=1, help="The financial year runs from 1 April to 31 March")
 
 financial_year = get_financial_year(str(selected_year))
 st.subheader(f'MP Expense Analysis for financial year 20{financial_year[0:2]}-20{financial_year[3:]}')
-
-#election_filter = st.sidebar.radio("Election Filter",["Old","New"], captions = ["Outgoing MP","Incoming MP"], help = "On election or by-election year which MP to use.")
-
-cost_select = st.sidebar.multiselect('Select cost categories',['MP Travel','Miscellaneous','Staffing','Winding Up',
-                        'Office Costs','Office Costs Expenditure','Staff Travel','Travel','Dependant Travel','Miscellaneous expenses','Accommodation','Start Up'])
-
-election_filter = st.sidebar.selectbox("Election Filter",("Outgoing MP","Incoming MP"), help = "On election or by-election year which MP to use.")
+incumbent = st.sidebar.toggle('Incumbent MP',value=True, help = "On election or by-election year which MP to use.")
+cost_category = st.sidebar.multiselect('Select cost categories',['Accommodation','MP Travel','Miscellaneous','Staffing','Winding Up',
+                        'Office Costs','Office Costs Expenditure','Staff Travel','Travel','Dependant Travel','Miscellaneous expenses','Start Up'],['Accommodation','MP Travel'])
+if cost_category == []:
+    st.sidebar.error("Please select at least one cost category")
+    st.stop()
 
 tab1, tab2, tab3 = st.tabs(["Map", "About", "Analysis"])
 
@@ -51,24 +53,26 @@ with tab1:
                                     pitch=28, bearing=0,
                                     height=600)
 
-    @st.cache_data
-    def get_all_mps(fin_year):
-        return pd.read_json(f'{api_url}/mps_basic/all?financial_year={fin_year}')
-
-    @st.cache_data
-    def get_data(category, fin_year):
-        return pd.read_json(f'{api_url}/expenses/{fin_year}?cost_category={category}')
+    
 
     def getfillcolour(bin):
         return colour_scheme[(bins-1) - bin]
                       
     with st.spinner('Getting the data...'):
-        uk_geo = gpd.read_file(DATA_URL)
-        mps = get_all_mps(financial_year)
-        mp_geo = uk_geo.merge(mps, left_on=['PCON21CD'], right_on=['constituency_code'], how='left')
-        data = get_data(cost_category, financial_year)
-        uk = mp_geo.merge(data, left_on=['id'], right_on=['mp_id'], how='left')
 
+        uk_geo = gpd.read_file('constituency_geometry.geojson')
+
+        mps = gravysql.get_mps(conn, financial_year, incumbent)
+        
+        mp_geo = uk_geo.merge(mps, left_on=['constituency_id'], right_on=['constituency_code'], how='left')
+
+        data = gravysql.get_expenses(conn, financial_year, cost_category)
+        if data.empty:
+            st.warning(f'No data found for financial year {financial_year} and cost category {cost_category}')
+            st.stop()
+
+        uk = mp_geo.merge(data, left_on=['id'], right_on=['mp_id'], how='left')
+        
         uk = uk.rename(columns={"constituency_x": "constituency", 
                         "party_colour_code_x": "party_colour_code",
                         "full_name_x": "full_name",
@@ -77,8 +81,9 @@ with tab1:
         uk["total_amount"] = uk["total_amount"].fillna(0)
         uk["elevation"] = uk["total_amount"]
         uk["bin"] = pd.cut(uk["elevation"], bins, labels=False)
-        uk["cost_category"] = cost_category
         uk["fill_colour"] = uk["bin"].apply(getfillcolour)
+        uk["mph"] = uk["total_amount"]/uk["miles_to_HP"]
+        uk["mph"] = uk["mph"].round(2)
 
     with st.spinner('Building the map...'):
         geojson = pdk.Layer(
@@ -98,7 +103,7 @@ with tab1:
         )
 
         tooltip = {
-            "html": "{constituency}<br />{full_name} ({party_name})<br />{cost_category}: £{total_amount}",
+            "html": "{constituency_name}<br />{full_name} ({party_name})<br />Total: £{total_amount}<br />HP: {miles_to_HP} miles<br />£{mph} per mile",
             "style": {
             "backgroundColor": "{party_colour}",
             "color": "white"}
@@ -112,4 +117,3 @@ with tab1:
         )
 
         st.pydeck_chart(r, use_container_width=True)
-#r.to_html("geojson_layer.html")
