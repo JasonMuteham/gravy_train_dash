@@ -19,7 +19,7 @@ conn = st.connection("duckdb", type=DuckDBConnection, database=db)
 
 
 
-with open('data\colorbrewer.json') as f:
+with open('data/colorbrewer.json') as f:
   colour_brewer = json.load(f)
 
 with open('style.css') as f:
@@ -60,7 +60,7 @@ with tab1:
                       
     with st.spinner('Getting the data...'):
 
-        uk_geo = gpd.read_file('constituency_geometry.geojson')
+        uk_geo = gpd.read_file('data/constituency_geometry.geojson')
 
         mps = gravysql.get_mps(conn, financial_year, incumbent)
         
