@@ -11,9 +11,11 @@ def get_mps(conn, financial_year, incumbent=True):
     fin_end_date = financial_date["end_date"]
 
     if incumbent:
-        where_statement = f" cr.start_date <= '{fin_start_date}'"      
+        where_statement = f" cr.start_date < '{fin_start_date}'"      
     else:
         where_statement = f" cr.start_date <= '{fin_end_date}'"
+
+    where_more = f"and cr.mp_id not in (select mp_id from main.constituency_representation where cr.end_date < '{fin_start_date}')"
         
     sql = f"""
             SELECT
@@ -26,7 +28,7 @@ def get_mps(conn, financial_year, incumbent=True):
             FROM main.constituency_representation cr
             JOIN main.mps ON mps.id = cr.mp_id
             JOIN main.constituency c ON c.id = cr.constituency_id
-            WHERE {where_statement}
+            WHERE {where_statement} {where_more}
         """
     return conn.query(sql)
 

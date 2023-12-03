@@ -86,14 +86,9 @@ with tab1:
                         "party_name_x": "party_name"})
         
         uk["total_amount"] = uk["total_amount"].fillna(0)
-
-
         uk["mph"] = uk["total_amount"]/uk["miles_to_HP"]
         uk["mph"] = uk["mph"].round(2)
-
-
         uk["elevation"] = uk["total_amount"]
-
 
         if colour == 'Total Cost':
             uk["bin"] = pd.cut(uk["total_amount"], bins, labels=False)
