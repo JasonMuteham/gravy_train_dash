@@ -38,7 +38,14 @@ selected_year = st.sidebar.number_input('Choose a year to view', min_value=2010,
 
 financial_year = get_financial_year(str(selected_year))
 st.subheader(f'MP Expense Analysis for financial year 20{financial_year[0:2]}-20{financial_year[3:]}')
-incumbent = st.sidebar.toggle('Incumbent MP',value=True, help = "On election or by-election year which MP to use.")
+
+
+colour = st.sidebar.radio(
+    'Colour value',
+    options=['Total Cost','Cost per mile'],horizontal=True)
+
+incumbent = st.sidebar.toggle('Incumbent MP',value=False, help = "On election or by-election year which MP to use.")
+
 cost_category = st.sidebar.multiselect('Select cost categories',['Accommodation','MP Travel','Miscellaneous','Staffing','Winding Up',
                         'Office Costs','Office Costs Expenditure','Staff Travel','Travel','Dependant Travel','Miscellaneous expenses','Start Up'],['Accommodation','MP Travel'])
 if cost_category == []:
@@ -79,11 +86,21 @@ with tab1:
                         "party_name_x": "party_name"})
         
         uk["total_amount"] = uk["total_amount"].fillna(0)
-        uk["elevation"] = uk["total_amount"]
-        uk["bin"] = pd.cut(uk["elevation"], bins, labels=False)
-        uk["fill_colour"] = uk["bin"].apply(getfillcolour)
+
+
         uk["mph"] = uk["total_amount"]/uk["miles_to_HP"]
         uk["mph"] = uk["mph"].round(2)
+
+
+        uk["elevation"] = uk["total_amount"]
+
+
+        if colour == 'Total Cost':
+            uk["bin"] = pd.cut(uk["total_amount"], bins, labels=False)
+        else:
+            uk["bin"] = pd.cut(uk["mph"], bins, labels=False)
+
+        uk["fill_colour"] = uk["bin"].apply(getfillcolour)
 
     with st.spinner('Building the map...'):
         geojson = pdk.Layer(
