@@ -26,18 +26,23 @@ with open('style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 bins = 9
-colour_scheme = colour_brewer["MyViridis"][f"{bins}"]
-selected_year = '2022'
+
+
+selected_year = 2022
 
 def get_financial_year(yr):
     fin_yr = int(yr[2:])
     return f"{fin_yr}_{fin_yr+1}"
 
 st.sidebar.header("GravyTrain `V1.0.0`")
-selected_year = st.sidebar.number_input('Choose a year to view', min_value=2010, max_value=2025, value=2021, step=1, help="The financial year runs from 1 April to 31 March")
+selected_year = st.sidebar.number_input('Choose a year to view', min_value=2010, max_value=2025, value=selected_year, step=1, help="The financial year runs from 1 April to 31 March")
 
 financial_year = get_financial_year(str(selected_year))
 st.subheader(f'MP Expense Analysis for financial year 20{financial_year[0:2]}-20{financial_year[3:]}')
+map_colour = st.sidebar.selectbox(
+    'Colour scheme',('Viridis','OrRd','PuBu','BuPu','Oranges','BuGn','YlOrBr','YlGn','Reds','RdOu','Greens','YlGnBu','Purples','GnBu','Greys','YlOrRd','PuRd','Blues','PuBuGn'),index=0, help = "Colour scheme for map")
+
+colour_scheme = colour_brewer[f"{map_colour}"][f"{bins}"]
 
 
 colour = st.sidebar.radio(
