@@ -3,7 +3,6 @@ import pydeck as pdk
 import geopandas as gpd
 import pandas as pd
 import json
-#from duckdb_connection import DuckDBConnection
 import gravysql
 import duckdb
 
@@ -11,14 +10,20 @@ st.set_page_config(
     page_title="The Gravy Train",
     page_icon="🚂",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
+    menu_items={
+        'Get Help': 'https://jasonmuteham.github.io/Portfolio/',
+        'Report a bug': "mailto:ancientwrangler@gmail.com",
+        'About': 'The Gravy Train, a geospatial visualization to analyse MP expense claims in the UK by [Jason Muteham](https://jasonmuteham.github.io/Portfolio/)'
+          
+    }
 )
 
-#db= f"md:gravy_train?motherduck_token={st.secrets['MOTHERDUCK_TOKEN']}"
+@st.cache_resource(ttl=3600)
+def open_connection():
+    return duckdb.connect()
 
-#conn = st.connection("duckdb", type=DuckDBConnection, database=db)
-
-conn = duckdb.connect()
+conn = open_connection()
 
 with open('data/colorbrewer.json') as f:
   colour_brewer = json.load(f)
@@ -27,8 +32,6 @@ with open('style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 bins = 9
-
-
 selected_year = 2022
 
 def get_financial_year(yr):
@@ -36,7 +39,7 @@ def get_financial_year(yr):
     return f"{fin_yr}_{fin_yr+1}"
 
 st.sidebar.header("GravyTrain `V1.0.0`")
-selected_year = st.sidebar.number_input('Choose a year to view', min_value=2010, max_value=2025, value=selected_year, step=1, help="The financial year runs from 1 April to 31 March")
+selected_year = st.sidebar.number_input('Choose a year to view', min_value=2010, max_value=2023, value=selected_year, step=1, help="The financial year runs from 1 April to 31 March")
 
 financial_year = get_financial_year(str(selected_year))
 st.subheader(f'MP Expense Analysis for financial year 20{financial_year[0:2]}-20{financial_year[3:]}')
@@ -44,21 +47,18 @@ map_colour = st.sidebar.selectbox(
     'Colour scheme',('Viridis','OrRd','PuBu','BuPu','Oranges','BuGn','YlOrBr','YlGn','Reds','RdOu','Greens','YlGnBu','Purples','GnBu','Greys','YlOrRd','PuRd','Blues','PuBuGn'),index=0, help = "Colour scheme for map")
 
 colour_scheme = colour_brewer[f"{map_colour}"][f"{bins}"]
-
-
 colour = st.sidebar.radio(
     'Colour value',
     options=['Total Cost','Cost per mile'],horizontal=True)
 
 incumbent = st.sidebar.toggle('Incumbent MP',value=False, help = "On election or by-election year which MP to use.")
-
 cost_category = st.sidebar.multiselect('Select cost categories',['Accommodation','MP Travel','Miscellaneous','Staffing','Winding Up',
                         'Office Costs','Office Costs Expenditure','Staff Travel','Travel','Dependant Travel','Miscellaneous expenses','Start Up'],['Accommodation','MP Travel'])
 if cost_category == []:
     st.sidebar.error("Please select at least one cost category")
     st.stop()
 
-tab1, tab2, tab3 = st.tabs(["Map", "About", "Analysis"])
+tab1, tab2 = st.tabs(["Map", "About"])
 
 with tab1:
     INITIAL_VIEW_STATE = pdk.ViewState( latitude=54.5, longitude=-2, 
@@ -118,7 +118,7 @@ with tab1:
         )
 
         tooltip = {
-            "html": "{constituency_name}<br />{full_name} ({party_name})<br />Total: £{total_amount}<br />HP: {miles_to_HP} miles<br />£{mph} per mile",
+            "html": "{constituency_name}<br />{full_name} ({party_name})<br />Total: £{total_amount}<br />Houses of Parliament: {miles_to_HP} miles<br />£{mph} per mile",
             "style": {
             "font-family": "Source Sans Pro, sans-serif",
             "color": "white"}
@@ -142,3 +142,23 @@ with tab1:
             mime='text/html',
             type='primary'
         )
+with tab2:
+    """
+A geospatial visualization to analyse MP expense claims by constituency.
+
+Data is supplied by 
+
+- UK Parliament [https://www.parliament.uk/]
+
+- Independent Parliamentary Standards Authority [https://www.theipsa.org.uk/]
+
+Over 2 million expense records form the basis of the analysis and the underlying database.
+
+The IPSA releases complete records for a financial period a few months after the end of a financial period.
+
+The financial period is 1st April - 31st March.
+
+The distance to the Houses of Parliament is calculated as the distance from the Houses of parliament to the centre of a constituency.
+
+Developed by Jason Muteham [https://jasonmuteham.github.io/Portfolio/]
+    """
