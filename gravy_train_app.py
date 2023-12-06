@@ -3,8 +3,9 @@ import pydeck as pdk
 import geopandas as gpd
 import pandas as pd
 import json
-from duckdb_connection import DuckDBConnection
+#from duckdb_connection import DuckDBConnection
 import gravysql
+import duckdb
 
 st.set_page_config(
     page_title="The Gravy Train",
@@ -13,11 +14,11 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-db= f"md:gravy_train?motherduck_token={st.secrets['MOTHERDUCK_TOKEN']}"
+#db= f"md:gravy_train?motherduck_token={st.secrets['MOTHERDUCK_TOKEN']}"
 
-conn = st.connection("duckdb", type=DuckDBConnection, database=db)
+#conn = st.connection("duckdb", type=DuckDBConnection, database=db)
 
-
+conn = duckdb.connect()
 
 with open('data/colorbrewer.json') as f:
   colour_brewer = json.load(f)
@@ -73,11 +74,8 @@ with tab1:
     with st.spinner('Getting the data...'):
 
         uk_geo = gpd.read_file('data/constituency_geometry.geojson')
-
         mps = gravysql.get_mps(conn, financial_year, incumbent)
-        
         mp_geo = uk_geo.merge(mps, left_on=['constituency_id'], right_on=['constituency_code'], how='left')
-
         data = gravysql.get_expenses(conn, financial_year, cost_category)
         if data.empty:
             st.warning(f'No data found for financial year {financial_year} and cost category {cost_category}')
@@ -122,7 +120,7 @@ with tab1:
         tooltip = {
             "html": "{constituency_name}<br />{full_name} ({party_name})<br />Total: £{total_amount}<br />HP: {miles_to_HP} miles<br />£{mph} per mile",
             "style": {
-            "backgroundColor": "{party_colour}",
+            "font-family": "Source Sans Pro, sans-serif",
             "color": "white"}
         }
 
@@ -134,3 +132,13 @@ with tab1:
         )
 
         st.pydeck_chart(r, use_container_width=True)
+
+        html_file = r.to_html(filename=None, as_string=True)
+
+        st.sidebar.download_button(
+            label="Download map",
+            data=html_file,
+            file_name='map.html',
+            mime='text/html',
+            type='primary'
+        )
