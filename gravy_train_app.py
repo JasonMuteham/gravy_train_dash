@@ -4,7 +4,6 @@ import geopandas as gpd
 import pandas as pd
 import json
 import gravysql
-import duckdb
 
 st.set_page_config(
     page_title="The Gravy Train",
@@ -14,16 +13,11 @@ st.set_page_config(
     menu_items={
         'Get Help': 'https://jasonmuteham.github.io/Portfolio/',
         'Report a bug': "mailto:ancientwrangler@gmail.com",
-        'About': 'The Gravy Train, a geospatial visualization to analyse MP expense claims in the UK by [Jason Muteham](https://jasonmuteham.github.io/Portfolio/)'
+        'About': 'The Gravy Train, a geospatial visualisation to analyse MP expense claims in the UK by [Jason Muteham](https://jasonmuteham.github.io/Portfolio/)'
           
     }
 )
 
-@st.cache_resource(ttl=3600)
-def open_connection():
-    return duckdb.connect()
-
-conn = open_connection()
 
 with open('data/colorbrewer.json') as f:
   colour_brewer = json.load(f)
@@ -74,9 +68,9 @@ with tab1:
     with st.spinner('Getting the data...'):
 
         uk_geo = gpd.read_file('data/constituency_geometry.geojson')
-        mps = gravysql.get_mps(conn, financial_year, incumbent)
+        mps = gravysql.get_mps(financial_year, incumbent)
         mp_geo = uk_geo.merge(mps, left_on=['constituency_id'], right_on=['constituency_code'], how='left')
-        data = gravysql.get_expenses(conn, financial_year, cost_category)
+        data = gravysql.get_expenses(financial_year, cost_category)
         if data.empty:
             st.warning(f'No data found for financial year {financial_year} and cost category {cost_category}')
             st.stop()
@@ -144,7 +138,7 @@ with tab1:
         )
 with tab2:
     """
-A geospatial visualization to analyse MP expense claims by constituency.
+### A geospatial visualisation of MP expense claims in the UK by constituency.
 
 Data is supplied by 
 
@@ -160,5 +154,5 @@ The financial period is 1st April - 31st March.
 
 The distance to the Houses of Parliament is calculated as the distance from the Houses of parliament to the centre of a constituency.
 
-Developed by Jason Muteham [https://jasonmuteham.github.io/Portfolio/]
+Developed by **Jason Muteham** [https://jasonmuteham.github.io/Portfolio/]
     """
