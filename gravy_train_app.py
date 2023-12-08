@@ -28,11 +28,12 @@ with open('style.css') as f:
 bins = 9
 selected_year = 2022
 
+
 def get_financial_year(yr):
     fin_yr = int(yr[2:])
     return f"{fin_yr}_{fin_yr+1}"
 
-st.sidebar.header("GravyTrain `V1.0.1`")
+st.sidebar.header("GravyTrain `V1.0.2`")
 selected_year = st.sidebar.number_input('Choose a year to view', min_value=2010, max_value=2023, value=selected_year, step=1, help="The financial year runs from 1 April to 31 March")
 
 financial_year = get_financial_year(str(selected_year))
@@ -52,19 +53,19 @@ if cost_category == []:
     st.sidebar.error("Please select at least one cost category")
     st.stop()
 
+def getfillcolour(bin):
+    return colour_scheme[(bins-1) - bin]
+
 tab1, tab2 = st.tabs(["Map", "About"])
 
 with tab1:
+
     INITIAL_VIEW_STATE = pdk.ViewState( latitude=54.5, longitude=-2, 
                                     zoom=4.5, max_zoom=10, min_zoom=4,
                                     pitch=28, bearing=0,
                                     height=600)
 
-    
-
-    def getfillcolour(bin):
-        return colour_scheme[(bins-1) - bin]
-                      
+                  
     with st.spinner('Getting the data...'):
 
         uk_geo = gpd.read_file('data/constituency_geometry.geojson')
@@ -120,7 +121,7 @@ with tab1:
 
         r = pdk.Deck(
             map_provider=None,
-            layers=[ geojson], 
+            layers=[geojson], 
             initial_view_state=INITIAL_VIEW_STATE, 
             tooltip=tooltip
         )
@@ -137,8 +138,9 @@ with tab1:
             type='primary'
         )
 with tab2:
+
     """
-### A geospatial visualisation of MP expense claims in the UK by constituency.
+### A geospatial visualisation of MP expense claims in the UK
 
 MP expenses are a hot topic in the UK, and my MP raised eyebrows with large claims for rented accommodation, even though they live in a constituency close to Parliament. This made me wonder if the outrage was justified.
 
@@ -160,7 +162,7 @@ Data is supplied by
 
 Over 2 million expense records form the basis of the analysis and the underlying database.
 
-The IPSA releases complete records for a financial period a few months after the end of a financial period.
+The IPSA releases complete records for a financial period several months after the end of a financial period.
 
 The financial period is 1st April - 31st March.
 
