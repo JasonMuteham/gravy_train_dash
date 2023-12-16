@@ -162,7 +162,7 @@ Data is supplied by
 
 Over 2 million expense records form the basis of the analysis and the underlying database.
 
-The IPSA releases complete records for a financial period several months after the end of a financial period.
+The IPSA release updates every two months, however data available for the two most recent financial years might not yet reflect the final positions for those years.
 
 The financial period is 1st April - 31st March.
 
