@@ -13,7 +13,7 @@ st.set_page_config(
     menu_items={
         'Get Help': 'https://jasonmuteham.github.io/Portfolio/',
         'Report a bug': "mailto:ancientwrangler@gmail.com",
-        'About': 'The Gravy Train, a geospatial visualisation to analyse MP expense claims in the UK by [Jason Muteham](https://jasonmuteham.github.io/Portfolio/)'
+        'About': 'The Gravy Train, a geospatial visualization of UK Member of Parliament expenses by [Jason Muteham](https://jasonmuteham.github.io/Portfolio/)'
           
     }
 )
@@ -26,14 +26,15 @@ with open('style.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 bins = 9
-selected_year = 2022
+selected_year = 2020
 
 
 def get_financial_year(yr):
     fin_yr = int(yr[2:])
     return f"{fin_yr}_{fin_yr+1}"
 
-st.sidebar.header("GravyTrain `V1.0.2`")
+st.sidebar.header("GravyTrain `V1.0.3`")
+st.sidebar.write("Data Updated `2023-12-05`")
 selected_year = st.sidebar.number_input('Choose a year to view', min_value=2010, max_value=2023, value=selected_year, step=1, help="The financial year runs from 1 April to 31 March")
 
 financial_year = get_financial_year(str(selected_year))
@@ -135,12 +136,14 @@ with tab1:
             data=html_file,
             file_name='map.html',
             mime='text/html',
-            type='primary'
-        )
+            type='primary',
+            help = 'Download the map as an HTML file'
+         )
+
 with tab2:
 
     """
-### A geospatial visualisation of MP expense claims in the UK
+### Geospatial Visualization of UK Member of Parliament Expenses
 
 MP expenses are a hot topic in the UK, and my MP raised eyebrows with large claims for rented accommodation, even though they live in a constituency close to Parliament. This made me wonder if the outrage was justified.
 
@@ -162,11 +165,12 @@ Data is supplied by
 
 Over 2 million expense records form the basis of the analysis and the underlying database.
 
-The IPSA releases complete records for a financial period several months after the end of a financial period.
+Note the IPSA do update records for a financial period several years after the end of a financial period.
 
 The financial period is 1st April - 31st March.
 
 The distance to the Houses of Parliament is calculated as the distance from the Houses of parliament to the centre of a constituency.
 
-Developed by **Jason Muteham** [https://jasonmuteham.github.io/Portfolio/]
+For more information about the pipeline and data stack [https://jasonmuteham.github.io/Portfolio/gravytrain.html]
+
     """
