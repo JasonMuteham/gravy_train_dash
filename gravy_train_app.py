@@ -34,7 +34,7 @@ def get_financial_year(yr):
     return f"{fin_yr}_{fin_yr+1}"
 
 st.sidebar.header("GravyTrain `V1.0.3`")
-st.sidebar.write("Data Updated `2023-12-05`")
+st.sidebar.write("Data Updated `2023-12-02`")
 selected_year = st.sidebar.number_input('Choose a year to view', min_value=2010, max_value=2023, value=selected_year, step=1, help="The financial year runs from 1 April to 31 March")
 
 financial_year = get_financial_year(str(selected_year))
@@ -61,10 +61,6 @@ tab1, tab2 = st.tabs(["Map", "About"])
 
 with tab1:
 
-#    INITIAL_VIEW_STATE = pdk.ViewState( latitude=54.5, longitude=-2, 
-#                                    zoom=4.5, max_zoom=10, min_zoom=4,
-#                                    pitch=28, bearing=0,
-#                                    height=600)
     INITIAL_VIEW_STATE = pdk.ViewState( latitude=51.2, longitude=0, 
                                     zoom=8, max_zoom=10, min_zoom=4,
                                     pitch=28, bearing=0,
