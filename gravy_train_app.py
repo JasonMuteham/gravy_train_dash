@@ -61,11 +61,14 @@ tab1, tab2 = st.tabs(["Map", "About"])
 
 with tab1:
 
-    INITIAL_VIEW_STATE = pdk.ViewState( latitude=54.5, longitude=-2, 
-                                    zoom=4.5, max_zoom=10, min_zoom=4,
+#    INITIAL_VIEW_STATE = pdk.ViewState( latitude=54.5, longitude=-2, 
+#                                    zoom=4.5, max_zoom=10, min_zoom=4,
+#                                    pitch=28, bearing=0,
+#                                    height=600)
+    INITIAL_VIEW_STATE = pdk.ViewState( latitude=51.2, longitude=0, 
+                                    zoom=8, max_zoom=10, min_zoom=4,
                                     pitch=28, bearing=0,
                                     height=600)
-
                   
     with st.spinner('Getting the data...'):
 
