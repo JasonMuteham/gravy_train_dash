@@ -18,7 +18,6 @@ st.set_page_config(
     }
 )
 
-
 with open('data/colorbrewer.json') as f:
   colour_brewer = json.load(f)
 
@@ -28,12 +27,11 @@ with open('style.css') as f:
 bins = 9
 selected_year = 2020
 
-
 def get_financial_year(yr):
     fin_yr = int(yr[2:])
     return f"{fin_yr}_{fin_yr+1}"
 
-st.sidebar.header("GravyTrain `V1.0.3`")
+st.sidebar.header("GravyTrain `V1.0.4`")
 st.sidebar.write("Data Updated `2023-12-02`")
 selected_year = st.sidebar.number_input('Choose a year to view', min_value=2010, max_value=2023, value=selected_year, step=1, help="The financial year runs from 1 April to 31 March")
 
@@ -141,7 +139,7 @@ with tab1:
 
 with tab2:
 
-    """
+   md_text = """
 ### Geospatial Visualization of UK Member of Parliament Expenses
 
 MP expenses are a hot topic in the UK, and my MP raised eyebrows with large claims for rented accommodation, even though they live in a constituency close to Parliament. This made me wonder if the outrage was justified.
@@ -172,4 +170,7 @@ The distance to the Houses of Parliament is calculated as the distance from the 
 
 For more information about the pipeline and data stack [https://jasonmuteham.github.io/Portfolio/gravytrain.html]
 
+<a href="https://jasonmuteham.github.io/Portfolio/gravytrain.html" target="_blank"><img src="https://jasonmuteham.github.io/Portfolio/images/EtL.png" width = "100%"></a>
+
     """
+   st.markdown(md_text, unsafe_allow_html=True)

@@ -12,6 +12,8 @@ MP expenses are a hot topic in the UK, and my MP raised eyebrows with large clai
 
 The outcome? The Gravy Train. Now armed with data, the question is: How does your MP's spending compare?
 
+
+
 Data is supplied by 
 
 - UK Parliament [https://www.parliament.uk/]
@@ -25,5 +27,7 @@ The IPSA release updates every two months, however data available for the two mo
 The financial period is 1st April - 31st March.
 
 The distance to the Houses of Parliament is calculated as the distance from the Houses of parliament to the centre of a constituency.
+
+![data stack](https://jasonmuteham.github.io/Portfolio/images/EtL.png)
 
 https://gravytrain.streamlit.app
