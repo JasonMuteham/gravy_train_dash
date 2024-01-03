@@ -12,12 +12,12 @@ def get_mps(financial_year, incumbent=True):
     fin_start_date = financial_date["start_date"]
     fin_end_date = financial_date["end_date"]
 
+    where_more = ''
     if incumbent:
         where_statement = f" cr.start_date < '{fin_start_date}'"      
     else:
         where_statement = f" cr.start_date <= '{fin_end_date}'"
-
-    where_more = f"and cr.mp_id not in (select mp_id from 'data/constituency_representation.parquet' where cr.end_date < '{fin_start_date}')"
+        where_more = f"and cr.mp_id not in (select mp_id from 'data/constituency_representation.parquet' where cr.end_date < '{fin_start_date}')"
         
     sql = f"""
             SELECT
@@ -37,7 +37,7 @@ def get_mps(financial_year, incumbent=True):
 def get_expenses(financial_year, cost_category):
     cost_category = ','.join(f"'{w}'" for w in cost_category)
     if cost_category is None or cost_category == "ALL":
-        sql_where = f"WHERE financial_year = '{financial_year}' AND cost_category IN ('Accommodation','MP Travel')"
+        sql_where = f"WHERE financial_year = '{financial_year}' AND cost_category IN ('Accommodation','Travel')"
     else:
         sql_where = f"WHERE financial_year = '{financial_year}' AND cost_category IN ({cost_category})"
     
@@ -46,11 +46,8 @@ def get_expenses(financial_year, cost_category):
                 mp_id,
                 SUM(amount_paid)::INTEGER AS total_amount,
                 ANY_VALUE(full_name) AS full_name,
-                ANY_VALUE(party_name) AS party_name,
-                ANY_VALUE(constituency_code) AS constituency_code,
-                ANY_VALUE(constituency) AS constituency,
                 ANY_VALUE(financial_year) AS financial_year            
-            FROM 'data/mp_expenses.parquet'
+            FROM 'data/expense.parquet'
             {sql_where}
             GROUP BY mp_id
         """

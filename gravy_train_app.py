@@ -31,9 +31,9 @@ def get_financial_year(yr):
     fin_yr = int(yr[2:])
     return f"{fin_yr}_{fin_yr+1}"
 
-st.sidebar.header("GravyTrain `V1.0.4`")
-st.sidebar.write("Data Updated `2023-12-02`")
-selected_year = st.sidebar.number_input('Choose a year to view', min_value=2010, max_value=2023, value=selected_year, step=1, help="The financial year runs from 1 April to 31 March")
+st.sidebar.header("GravyTrain `V1.1.0`")
+st.sidebar.write("Data Updated `2024-01-03`")
+selected_year = st.sidebar.number_input('Choose a year to view', min_value=2010, max_value=2022, value=selected_year, step=1, help="The financial year runs from 1 April to 31 March")
 
 financial_year = get_financial_year(str(selected_year))
 st.subheader(f'MP Expense Analysis for financial year 20{financial_year[0:2]}-20{financial_year[3:]}')
@@ -46,8 +46,7 @@ colour = st.sidebar.radio(
     options=['Total Cost','Cost per mile'],horizontal=True)
 
 incumbent = st.sidebar.toggle('Incumbent MP',value=False, help = "On election or by-election year which MP to use.")
-cost_category = st.sidebar.multiselect('Select cost categories',['Accommodation','MP Travel','Miscellaneous','Staffing','Winding Up',
-                        'Office Costs','Office Costs Expenditure','Staff Travel','Travel','Dependant Travel','Miscellaneous expenses','Start Up'],['Accommodation','MP Travel'])
+cost_category = st.sidebar.multiselect('Select cost categories',['Office', 'Staffing', 'Accommodation', 'Startup', 'Windup', 'Travel', 'Other'],['Accommodation','Travel'])
 if cost_category == []:
     st.sidebar.error("Please select at least one cost category")
     st.stop()
@@ -159,8 +158,6 @@ Data is supplied by
 - UK Parliament [https://www.parliament.uk/]
 
 - Independent Parliamentary Standards Authority [https://www.theipsa.org.uk/]
-
-Over 2 million expense records form the basis of the analysis and the underlying database.
 
 The IPSA release updates every two months, however data available for the two most recent financial years might not yet reflect the final positions for those years.
 
