@@ -11,9 +11,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
-        'Get Help': 'https://jasonmuteham.github.io/Portfolio/',
+        'Get Help': 'https://jasonmuteham.co.uk',
         'Report a bug': "mailto:ancientwrangler@gmail.com",
-        'About': 'The Gravy Train, a geospatial visualization of UK Member of Parliament expenses by [Jason Muteham](https://jasonmuteham.github.io/Portfolio/)'
+        'About': 'The Gravy Train, a geospatial visualization of UK Member of Parliament expenses by [Jason Muteham](https://jasonmuteham.co.uk)'
           
     }
 )
@@ -165,9 +165,9 @@ The financial period is 1st April - 31st March.
 
 The distance to the Houses of Parliament is calculated as the distance from the Houses of parliament to the centre of a constituency.
 
-For more information about the pipeline and data stack [https://jasonmuteham.github.io/Portfolio/gravytrain.html]
+For more information about the pipeline and data stack [https://jasonmuteham.co.uk/gravytrain.html]
 
-<a href="https://jasonmuteham.github.io/Portfolio/gravytrain.html" target="_blank"><img src="https://jasonmuteham.github.io/Portfolio/images/EtL.png" width = "100%"></a>
+<a href="https://jasonmuteham.co.uk/gravytrain.html" target="_blank"><img src="https://jasonmuteham.github.io/Portfolio/images/EtL.png" width = "100%"></a>
 
     """
    st.markdown(md_text, unsafe_allow_html=True)
